@@ -5,29 +5,48 @@ const port = 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-function countSubsets(n) {
-    let subsets = [];
-
-    for (let i = 0; i <= n; i++) {
-        if (i === 0) {
-            subsets[i] = 1;
-        } else {
-            subsets[i] = subsets[i - 1] * 2;
-        }
+function binomialCoefficient(n, k) {
+    if (k === 0 || k === n) {
+        return 1;
+    } else {
+        return binomialCoefficient(n - 1, k - 1) + binomialCoefficient(n - 1, k);
     }
+}
 
-    return subsets;
+function stirlingNumberSecond(n, k) {
+    if (n === 0 && k === 0) {
+        return 1;
+    } else if (n === 0 || k === 0 || k > n) {
+        return 0;
+    } else {
+        return k * stirlingNumberSecond(n - 1, k) + stirlingNumberSecond(n - 1, k - 1);
+    }
+}
+
+function numberOfTopologies(n) {
+    let result = 0;
+    for (let k = 0; k <= n; k++) {
+        result += binomialCoefficient(n, k) * factorial(k) * stirlingNumberSecond(n, k);
+    }
+    return result;
+}
+
+function factorial(num) {
+    if (num <= 1) {
+        return 1;
+    } else {
+        return num * factorial(num - 1);
+    }
 }
 
 function countTopologies(n) {
     let topologies = [];
-    let subsets = countSubsets(n);
 
     for (let i = 0; i <= n; i++) {
         if (i === 0 || i === 1) {
             topologies[i] = 1;
         } else {
-            topologies[i] = subsets[i] + topologies[i - 1];
+            topologies[i] = numberOfTopologies(i);
         }
     }
 
